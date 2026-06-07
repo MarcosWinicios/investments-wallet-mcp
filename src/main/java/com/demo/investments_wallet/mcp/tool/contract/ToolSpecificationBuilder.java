@@ -1,20 +1,25 @@
 package com.demo.investments_wallet.mcp.tool.contract;
 
 import com.demo.investments_wallet.utils.JsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class ToolSpecificationBuilder {
+@Slf4j
+@Component
+public class ToolSpecificationBuilder {
 
-    private ToolSpecificationBuilder(){}
-
-    @Autowired
     private static JsonUtil jsonUtil;
+
+    private ToolSpecificationBuilder(JsonUtil jsonUtil) {
+        ToolSpecificationBuilder.jsonUtil = jsonUtil;
+    }
 
     public static McpServerFeatures.SyncToolSpecification build(McpToolDefinition definition) {
 
@@ -39,19 +44,25 @@ public final class ToolSpecificationBuilder {
 
 
     private static McpSchema.CallToolResult toCallToolResult(McpToolResponse mcpToolResponse) {
-        String json = jsonUtil.toJson(mcpToolResponse);
+        try {
 
-        List<McpSchema.Content> content = List.of(
-               new McpSchema.TextContent(json)
-        );
+            String json = jsonUtil.toJson(mcpToolResponse);
 
-        return McpSchema.CallToolResult.builder()
-                .isError(!mcpToolResponse.success())
-                .content(content)
-                .build();
+            List<McpSchema.Content> content = List.of(
+                    new McpSchema.TextContent(json)
+            );
+
+            return McpSchema.CallToolResult.builder()
+                    .isError(!mcpToolResponse.success())
+                    .content(content)
+                    .build();
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
-    private static Map<String, Object> resolveInputSchema(McpToolInputSchema inputSchema){
+    private static Map<String, Object> resolveInputSchema(McpToolInputSchema inputSchema) {
         final Map<String, Object> result = new LinkedHashMap<>();
         final Map<String, Object> properties = new LinkedHashMap<>();
 
