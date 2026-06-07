@@ -13,9 +13,13 @@ import com.demo.investments_wallet.dto.SellAssetRequestDto;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class PortfolioOperationService {
 
@@ -37,6 +41,7 @@ public class PortfolioOperationService {
 
     @Transactional
     public AssetOperationResponseDto buyAsset(BuyAssetRequestDto request) {
+        log.info("buyAsset - start...");
         if (request == null) {
             throw new DomainValidationException("Buy request cannot be null");
         }
@@ -76,6 +81,8 @@ public class PortfolioOperationService {
         }
 
         PortfolioPositionEntity persisted = portfolioPositionRepository.saveAndFlush(position);
+
+        log.info("buyAsset - Persisted Portfolio Position: {}", persisted.getClass().getSimpleName());
         recordTransaction(OperationType.BUY, asset, quantity, unitPrice, totalAmount);
 
         return new AssetOperationResponseDto(
@@ -160,7 +167,8 @@ public class PortfolioOperationService {
         transaction.setUnitPrice(unitPrice);
         transaction.setTotalAmount(totalAmount);
         transaction.setOperationTimestamp(LocalDateTime.now());
-        transactionHistoryRepository.save(transaction);
+        transactionHistoryRepository.saveAndFlush(transaction);
+        log.info("recordTransaction - Transaction Record: {} - {}", transaction.getAssetCode(), transaction.getTotalAmount());
     }
 
     private boolean isNonPositive(BigDecimal value) {
