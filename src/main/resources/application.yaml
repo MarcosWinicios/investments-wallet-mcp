@@ -24,6 +24,10 @@ spring:
       io.modelcontextprotocol: DEBUG
       org.springframework.ai.mcp: DEBUG
 
+logging:
+  level:
+    com.demo.investments_wallet.utils.JsonUtil: DEBUG
+
 server:
   port: 8081
 
