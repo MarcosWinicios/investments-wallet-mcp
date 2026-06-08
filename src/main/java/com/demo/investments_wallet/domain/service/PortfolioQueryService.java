@@ -2,17 +2,18 @@ package com.demo.investments_wallet.domain.service;
 
 import com.demo.investments_wallet.domain.entity.AssetEntity;
 import com.demo.investments_wallet.domain.entity.PortfolioPositionEntity;
-import com.demo.investments_wallet.domain.types.AssetCategory;
 import com.demo.investments_wallet.domain.repository.PortfolioPositionRepository;
+import com.demo.investments_wallet.domain.types.AssetCategory;
 import com.demo.investments_wallet.dto.PortfolioPositionViewDto;
 import com.demo.investments_wallet.dto.PortfolioSummaryResponseDto;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PortfolioQueryService extends DomainLogger{
