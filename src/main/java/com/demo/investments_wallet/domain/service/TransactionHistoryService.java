@@ -4,8 +4,9 @@ import com.demo.investments_wallet.domain.entity.TransactionHistoryEntity;
 import com.demo.investments_wallet.domain.repository.TransactionHistoryRepository;
 import com.demo.investments_wallet.dto.TransactionHistoryEntryDto;
 import com.demo.investments_wallet.dto.TransactionHistoryFilterRequestDto;
-import java.util.List;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TransactionHistoryService {
