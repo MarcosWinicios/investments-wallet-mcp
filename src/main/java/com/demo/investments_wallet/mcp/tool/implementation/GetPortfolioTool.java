@@ -33,7 +33,7 @@ public class GetPortfolioTool  implements McpToolDefinition {
     private McpToolInputSchema buildInputSchema() {
         return McpToolInputSchema.builder()
                 .isRequired(false)
-                .type("string")
+                .type("object")
                 .build();
     }
 

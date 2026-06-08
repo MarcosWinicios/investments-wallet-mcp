@@ -53,9 +53,6 @@ public class BuyAssetTool implements McpToolDefinition {
 
     @Override
     public McpToolResponse execute(Map<String, Object> parameters) {
-        this.logStart();
-        this.logInfo("Input parameters: " + parameters);
-
         Map<String, Object> responseMap = new LinkedHashMap<>();
         try {
 
@@ -78,14 +75,10 @@ public class BuyAssetTool implements McpToolDefinition {
 
             AssetOperationResponseDto response = this.portfolioOperationService.buyAsset(request);
             responseMap = response.toMap();
-
-            this.logFinish();
             return McpToolResponse.success(responseMap);
         } catch (Exception ex) {
             this.logError(ex);
             responseMap.put("error", ex.getMessage());
-
-            this.logFinish();
             return McpToolResponse.failure(responseMap);
         }
     }

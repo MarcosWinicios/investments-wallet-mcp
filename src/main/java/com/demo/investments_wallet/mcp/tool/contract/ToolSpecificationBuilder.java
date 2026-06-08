@@ -32,18 +32,30 @@ public class ToolSpecificationBuilder {
                 .inputSchema(inputSchema)
                 .build();
 
-        return McpServerFeatures.SyncToolSpecification.builder()
+        McpServerFeatures.SyncToolSpecification createdTool = McpServerFeatures.SyncToolSpecification.builder()
                 .tool(tool)
                 .callHandler((exchange, request) -> {
+                    log.info("Tool Executor[{}] - execution start...", tool.name());
                     Map<String, Object> arguments = request.arguments();
+
+                    log.debug("Tool Executor[{}] - received arguments {}", tool.name(), arguments.toString());
+
                     McpToolResponse result = definition.execute(arguments);
-                    return toCallToolResult(result);
+                    McpSchema.CallToolResult callToolResult = toCallToolResult(result, tool.name());
+
+                    log.debug("Tool Executor[{}] - response tool execution: {}",  tool.name(), callToolResult.toString());
+
+                    log.info("Tool Executor[{}] - execution end...", tool.name());
+                    return callToolResult;
                 })
                 .build();
+        log.info("registered tool: [{}] - inputSchema: {}", tool.name(), inputSchema.toString());
+        return createdTool;
     }
 
 
-    private static McpSchema.CallToolResult toCallToolResult(McpToolResponse mcpToolResponse) {
+    private static McpSchema.CallToolResult toCallToolResult(McpToolResponse mcpToolResponse, String toolName) {
+        log.info("Tool Executor[{}] -  building response...",  toolName);
         try {
 
             String json = jsonUtil.toJson(mcpToolResponse);
@@ -84,8 +96,6 @@ public class ToolSpecificationBuilder {
         result.put("type", inputSchema.getType());
         result.put("required", requiredFields);
         result.put("properties", properties);
-
         return result;
-
     }
 }
