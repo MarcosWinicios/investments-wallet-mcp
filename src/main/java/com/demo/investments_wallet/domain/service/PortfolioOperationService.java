@@ -68,33 +68,46 @@ public class PortfolioOperationService extends DomainLogger{
         PortfolioPositionEntity position = portfolioPositionRepository.findByAssetCode(asset.getCode())
                 .orElseGet(() -> newPosition(asset, resolvedQuantity, unitPrice));
 
+        BigDecimal newTotalAmount = BigDecimal.ZERO;
         if (position.getId() != null) {
             BigDecimal oldQuantity = position.getQuantity();
             BigDecimal newQuantity = oldQuantity.add(quantity);
+
             BigDecimal weightedOldValue = oldQuantity.multiply(position.getAveragePrice());
             BigDecimal weightedNewValue = quantity.multiply(unitPrice);
+
             BigDecimal newAveragePrice = weightedOldValue.add(weightedNewValue)
                     .divide(newQuantity, 2, RoundingMode.HALF_UP);
 
+            BigDecimal oldTotalAmount = position.getTotalAmount();
+            newTotalAmount = oldTotalAmount.add(totalAmount);
+
+            position.setTotalAmount(newTotalAmount);
             position.setQuantity(newQuantity);
             position.setAveragePrice(newAveragePrice);
+        } else {
+           newTotalAmount = newTotalAmount.add(totalAmount);
         }
+
+        position.setTotalAmount(newTotalAmount);
 
         PortfolioPositionEntity persisted = portfolioPositionRepository.saveAndFlush(position);
 
-        log.info("buyAsset - Persisted Portfolio Position: {}", persisted.getClass().getSimpleName());
         recordTransaction(OperationType.BUY, asset, quantity, unitPrice, totalAmount);
 
-        AssetOperationResponseDto result = new AssetOperationResponseDto(
-                OperationType.BUY,
-                asset.getCode(),
-                asset.getName(),
-                asset.getCategory(),
-                quantity,
-                totalAmount,
-                persisted.getQuantity()
-        );
-        this.logEndMethod("buyAsset",  request);
+        AssetOperationResponseDto result = AssetOperationResponseDto.builder()
+                .operationType(OperationType.BUY)
+                .assetCategory(asset.getCategory())
+                .assetCode(asset.getCode())
+                .assetName(asset.getName())
+                .transactionQuantity(quantity)
+                .transactionAmount(totalAmount)
+                .newAssetBalance(persisted.getTotalAmount())
+                .newQuantity(persisted.getQuantity().setScale(2, RoundingMode.HALF_UP))
+                .newAveragePrice(persisted.getAveragePrice())
+                .build();
+
+        this.logEndMethod("buyAsset",  result);
         return result;
     }
 
@@ -128,15 +141,8 @@ public class PortfolioOperationService extends DomainLogger{
 
         recordTransaction(OperationType.SELL, asset, request.quantity(), unitPrice, totalAmount);
 
-        return new AssetOperationResponseDto(
-                OperationType.SELL,
-                asset.getCode(),
-                asset.getName(),
-                asset.getCategory(),
-                request.quantity(),
-                totalAmount,
-                updatedQuantity
-        );
+       AssetOperationResponseDto result = AssetOperationResponseDto.builder().build();
+       return result;
     }
 
     private PortfolioPositionEntity newPosition(
@@ -171,8 +177,10 @@ public class PortfolioOperationService extends DomainLogger{
         transaction.setOperationTimestamp(LocalDateTime.now());
         transactionHistoryRepository.saveAndFlush(transaction);
 
-        this.logInfo("recordTransaction", String.format(
-                "Transaction Record: [%s] - %s total: %s",
+        this.logDebug("recordTransaction", String.format(
+                "transaction: %s | assetType: %s | asset: %s | quantity: %s | total: %s",
+                transaction.getOperationType(),
+                transaction.getAssetCategory(),
                 transaction.getAssetCode(),
                 transaction.getQuantity(),
                 transaction.getTotalAmount()
