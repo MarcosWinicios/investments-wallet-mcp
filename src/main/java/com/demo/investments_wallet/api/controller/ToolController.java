@@ -1,7 +1,6 @@
 package com.demo.investments_wallet.api.controller;
 
 import com.demo.investments_wallet.mcp.McpService;
-import com.demo.investments_wallet.mcp.resource.contract.McpResourceData;
 import com.demo.investments_wallet.mcp.to.ToolDataResumeTo;
 import com.demo.investments_wallet.mcp.tool.ToolService;
 import com.demo.investments_wallet.mcp.tool.contract.McpToolData;

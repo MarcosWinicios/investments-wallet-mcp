@@ -1,6 +1,5 @@
 package com.demo.investments_wallet.mcp;
 
-import com.demo.investments_wallet.mcp.resource.contract.McpResourceData;
 import com.demo.investments_wallet.mcp.resource.contract.McpResourceDefinition;
 import com.demo.investments_wallet.mcp.to.ResourceDataResumeTo;
 import com.demo.investments_wallet.mcp.to.ToolDataResumeTo;
@@ -18,12 +17,10 @@ public class McpService {
 
     private final List<McpResourceDefinition> availableResources;
     private final List<McpToolDefinition> availableTools;
-    private final JsonUtil jsonUtil;
 
-    public McpService(List<McpResourceDefinition> availableResources, List<McpToolDefinition> availableTools, JsonUtil jsonUtil) {
+    public McpService(List<McpResourceDefinition> availableResources, List<McpToolDefinition> availableTools) {
         this.availableResources = availableResources;
         this.availableTools = availableTools;
-        this.jsonUtil = jsonUtil;
     }
 
     public List<ResourceDataResumeTo> getAvailableResources() {
@@ -65,7 +62,7 @@ public class McpService {
                 .description(tool.getData().description())
                 .build();
         try {
-            String inputSchemaJson = this.jsonUtil.toJson(tool.getData().inputSchema());
+            String inputSchemaJson = JsonUtil.toJson(tool.getData().inputSchema());
             response.setInputSchema(inputSchemaJson);
         } catch (Exception e) {
             response.setInputSchema("Error serializing input schema: " + e.getMessage());
