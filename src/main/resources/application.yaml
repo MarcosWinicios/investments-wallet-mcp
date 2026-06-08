@@ -27,6 +27,8 @@ spring:
 logging:
   level:
     com.demo.investments_wallet.utils.JsonUtil: DEBUG
+    com.demo.investments_wallet.domain: DEBUG
+    com.demo.investments_wallet.mcp: DEBUG
 
 server:
   port: 8081
