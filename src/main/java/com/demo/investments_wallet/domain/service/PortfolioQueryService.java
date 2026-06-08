@@ -15,7 +15,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PortfolioQueryService {
+public class PortfolioQueryService extends DomainLogger{
 
     private final PortfolioPositionRepository portfolioPositionRepository;
     private final AssetCatalogService assetCatalogService;
@@ -29,6 +29,8 @@ public class PortfolioQueryService {
     }
 
     public PortfolioSummaryResponseDto getPortfolio() {
+        this.logStartMethod("getPortfolio");
+
         List<PortfolioPositionEntity> positions = portfolioPositionRepository.findAllActivePositions();
         List<PortfolioPositionViewDto> views = new ArrayList<>();
         Map<AssetCategory, BigDecimal> categoryValues = new EnumMap<>(AssetCategory.class);
@@ -63,6 +65,10 @@ public class PortfolioQueryService {
             allocation.put(entry.getKey(), percent);
         }
 
-        return new PortfolioSummaryResponseDto(views, totalPortfolioValue.setScale(2, RoundingMode.HALF_UP), allocation);
+        PortfolioSummaryResponseDto result =
+                new PortfolioSummaryResponseDto(views, totalPortfolioValue.setScale(2, RoundingMode.HALF_UP), allocation);
+
+        this.logEndMethod("getPortfolio", result);
+        return result;
     }
 }

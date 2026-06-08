@@ -3,25 +3,24 @@ package com.demo.investments_wallet.domain.service;
 import com.demo.investments_wallet.domain.entity.AssetEntity;
 import com.demo.investments_wallet.domain.entity.PortfolioPositionEntity;
 import com.demo.investments_wallet.domain.entity.TransactionHistoryEntity;
-import com.demo.investments_wallet.domain.types.OperationType;
 import com.demo.investments_wallet.domain.exception.DomainValidationException;
 import com.demo.investments_wallet.domain.repository.PortfolioPositionRepository;
 import com.demo.investments_wallet.domain.repository.TransactionHistoryRepository;
+import com.demo.investments_wallet.domain.types.OperationType;
 import com.demo.investments_wallet.dto.AssetOperationResponseDto;
 import com.demo.investments_wallet.dto.BuyAssetRequestDto;
 import com.demo.investments_wallet.dto.SellAssetRequestDto;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service
-public class PortfolioOperationService {
+public class PortfolioOperationService extends DomainLogger{
 
     private static final BigDecimal ZERO = BigDecimal.ZERO;
 
@@ -41,9 +40,10 @@ public class PortfolioOperationService {
 
     @Transactional
     public AssetOperationResponseDto buyAsset(BuyAssetRequestDto request) {
-        log.info("buyAsset - start...");
+        this.logStartMethod("buyAsset",  request);
+
         if (request == null) {
-            throw new DomainValidationException("Buy request cannot be null");
+            throw new DomainValidationException("Buy Asset request cannot be null");
         }
 
         AssetEntity asset = assetCatalogService.getAsset(request.assetCode());
@@ -85,7 +85,7 @@ public class PortfolioOperationService {
         log.info("buyAsset - Persisted Portfolio Position: {}", persisted.getClass().getSimpleName());
         recordTransaction(OperationType.BUY, asset, quantity, unitPrice, totalAmount);
 
-        return new AssetOperationResponseDto(
+        AssetOperationResponseDto result = new AssetOperationResponseDto(
                 OperationType.BUY,
                 asset.getCode(),
                 asset.getName(),
@@ -94,6 +94,8 @@ public class PortfolioOperationService {
                 totalAmount,
                 persisted.getQuantity()
         );
+        this.logEndMethod("buyAsset",  request);
+        return result;
     }
 
     @Transactional
@@ -168,7 +170,13 @@ public class PortfolioOperationService {
         transaction.setTotalAmount(totalAmount);
         transaction.setOperationTimestamp(LocalDateTime.now());
         transactionHistoryRepository.saveAndFlush(transaction);
-        log.info("recordTransaction - Transaction Record: {} - {}", transaction.getAssetCode(), transaction.getTotalAmount());
+
+        this.logInfo("recordTransaction", String.format(
+                "Transaction Record: [%s] - %s total: %s",
+                transaction.getAssetCode(),
+                transaction.getQuantity(),
+                transaction.getTotalAmount()
+        ));
     }
 
     private boolean isNonPositive(BigDecimal value) {
