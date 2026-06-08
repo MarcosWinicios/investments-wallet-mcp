@@ -1,12 +1,11 @@
 package com.demo.investments_wallet.config;
 
 import com.demo.investments_wallet.mcp.tool.contract.McpToolDefinition;
-
-import java.util.List;
-
 import io.modelcontextprotocol.server.McpServerFeatures;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class McpToolsConfig {
