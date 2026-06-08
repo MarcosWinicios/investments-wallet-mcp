@@ -11,14 +11,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class AvailableInvestments implements McpResourceDefinition {
+public class AvailableInvestmentsResource implements McpResourceDefinition {
 
     private final AssetCatalogService assetCatalogService;
-    private final JsonUtil jsonUtil;
 
-    public AvailableInvestments(AssetCatalogService assetCatalogService, JsonUtil jsonUtil) {
+    public AvailableInvestmentsResource(AssetCatalogService assetCatalogService) {
         this.assetCatalogService = assetCatalogService;
-        this.jsonUtil = jsonUtil;
     }
 
 
@@ -26,7 +24,7 @@ public class AvailableInvestments implements McpResourceDefinition {
     public McpResourceData data() {
 
         List<AssetEntity> catalog = assetCatalogService.getAllAssets();
-        String catalogJson = jsonUtil.toJson(catalog);
+        String catalogJson = JsonUtil.toJson(catalog);
 
         return McpResourceData.builder()
                 .uri("catalog://available-assets")
