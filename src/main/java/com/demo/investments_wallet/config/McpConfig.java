@@ -1,6 +1,7 @@
 package com.demo.investments_wallet.config;
 
 import com.demo.investments_wallet.mcp.resource.contract.McpResourceDefinition;
+import com.demo.investments_wallet.mcp.tool.contract.McpToolDefinition;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,15 +9,19 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class McpResourcesConfig {
+public class McpConfig {
 
     @Bean
     List<McpServerFeatures.SyncResourceSpecification> resources(List<McpResourceDefinition> resources){
-
-        List<McpServerFeatures.SyncResourceSpecification> result = resources.stream()
+        return resources.stream()
                 .map(McpResourceDefinition::build)
                 .toList();
+    }
 
-        return result;
+    @Bean
+    List<McpServerFeatures.SyncToolSpecification> tools(List<McpToolDefinition> tools){
+        return tools.stream()
+                .map(McpToolDefinition::build)
+                .toList();
     }
 }
