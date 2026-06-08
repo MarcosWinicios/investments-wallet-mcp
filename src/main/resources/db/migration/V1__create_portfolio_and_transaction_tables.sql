@@ -5,6 +5,7 @@ CREATE TABLE tb_portfolio_position (
     asset_category VARCHAR(30) NOT NULL,
     quantity NUMERIC(19,8) NOT NULL CHECK (quantity >= 0),
     average_price NUMERIC(19,2) NOT NULL CHECK (average_price >= 0),
+    total_amount NUMERIC(19,2) NOT NULL CHECK ( total_amount >= 0),
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
