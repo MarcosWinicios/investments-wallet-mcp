@@ -7,19 +7,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 @Slf4j
-@Component
-public class JsonUtil {
+public final class JsonUtil {
 
-    private final ObjectMapper objectMapper;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JsonUtil() {
-        this.objectMapper = new ObjectMapper();
+    static {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
@@ -31,12 +28,12 @@ public class JsonUtil {
      * @return the generated JSON string
      * @throws IllegalArgumentException if serialization fails
      */
-    public String toJson(Object object) {
+    public static String toJson(Object object) {
         try {
-            log.debug("JsonUtil.toJson: input: {}", object.toString());
+            log.debug("JsonUtil[toJson] - input: {}", object.toString());
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            log.error("JsonUtil.toJson: error {}", e.getMessage(), e);
+            log.error("JsonUtil[toJson] - error {}", e.getMessage(), e);
             throw new IllegalArgumentException(
                     "Failed to serialize object to JSON",
                     e
@@ -51,13 +48,13 @@ public class JsonUtil {
      * @return the generated formatted JSON string
      * @throws IllegalArgumentException if serialization fails
      */
-    public String toPrettyJson(Object object) {
+    public static String toPrettyJson(Object object) {
         try {
             return objectMapper
                     .writerWithDefaultPrettyPrinter()
                     .writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            log.error("JsonUtil.toPrettyJson: error {}", e.getMessage(), e);
+            log.error("JsonUtil[toPrettyJson] - error {}", e.getMessage(), e);
             throw new IllegalArgumentException(
                     "Failed to serialize object to formatted JSON",
                     e
@@ -74,11 +71,11 @@ public class JsonUtil {
      * @return the deserialized object
      * @throws IllegalArgumentException if deserialization fails
      */
-    public <T> T fromJson(String json, Class<T> clazz) {
+    public static  <T> T fromJson(String json, Class<T> clazz) {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
-            log.error("JsonUtil.fromJson: error {}", e.getMessage(), e);
+            log.error("JsonUtil[fromJson] - error {}", e.getMessage(), e);
             throw new IllegalArgumentException(
                     "Failed to deserialize JSON to object",
                     e
@@ -95,11 +92,11 @@ public class JsonUtil {
      * @return the deserialized object
      * @throws IllegalArgumentException if deserialization fails
      */
-    public <T> T fromJson(String json, TypeReference<T> typeReference) {
+    public static  <T> T fromJson(String json, TypeReference<T> typeReference) {
         try {
             return objectMapper.readValue(json, typeReference);
         } catch (JsonProcessingException e) {
-            log.error("JsonUtil.fromJson: error {}", e.getMessage(), e);
+            log.error("JsonUtil[fromJson] - error {}", e.getMessage(), e);
             throw new IllegalArgumentException(
                     "Failed to deserialize JSON to generic type",
                     e
@@ -113,7 +110,7 @@ public class JsonUtil {
      * @param object the source object
      * @return the generated JsonNode
      */
-    public JsonNode toTree(Object object) {
+    public static JsonNode toTree(Object object) {
         return objectMapper.valueToTree(object);
     }
 
@@ -124,11 +121,11 @@ public class JsonUtil {
      * @return the parsed JsonNode
      * @throws IllegalArgumentException if parsing fails
      */
-    public JsonNode readTree(String json) {
+    public static JsonNode readTree(String json) {
         try {
             return objectMapper.readTree(json);
         } catch (JsonProcessingException e) {
-            log.error("JsonUtil.readTree: error {}", e.getMessage(), e);
+            log.error("JsonUtil[readTree] - error {}", e.getMessage(), e);
             throw new IllegalArgumentException(
                     "Failed to parse JSON into JsonNode",
                     e
@@ -145,11 +142,11 @@ public class JsonUtil {
      * @return the deserialized object
      * @throws IllegalArgumentException if reading or deserialization fails
      */
-    public <T> T readFile(Path path, Class<T> clazz) {
+    public static  <T> T readFile(Path path, Class<T> clazz) {
         try {
             return objectMapper.readValue(path.toFile(), clazz);
         } catch (IOException e) {
-            log.error("JsonUtil.readFile: error {}", e.getMessage(), e);
+            log.error("JsonUtil[readFile] - error {}", e.getMessage(), e);
             throw new IllegalArgumentException(
                     "Failed to read JSON file",
                     e
@@ -164,13 +161,13 @@ public class JsonUtil {
      * @param object the object to be serialized
      * @throws IllegalArgumentException if writing fails
      */
-    public void writeFile(Path path, Object object) {
+    public static void writeFile(Path path, Object object) {
         try {
             objectMapper
                     .writerWithDefaultPrettyPrinter()
                     .writeValue(path.toFile(), object);
         } catch (IOException e) {
-            log.error("JsonUtil.writeFile: error {}", e.getMessage(), e);
+            log.error("JsonUtil[writeFile] - error {}", e.getMessage(), e);
             throw new IllegalArgumentException(
                     "Failed to write JSON file",
                     e
