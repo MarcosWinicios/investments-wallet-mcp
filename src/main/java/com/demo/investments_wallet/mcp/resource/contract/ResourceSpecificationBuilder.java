@@ -6,27 +6,6 @@ import java.util.List;
 
 public final class ResourceSpecificationBuilder {
 
-    private ResourceSpecificationBuilder() {
-    }
-
-    public static McpServerFeatures.SyncResourceSpecification build(
-            String uri,
-            String name,
-            String description,
-            String mimetype,
-            String content
-    ) {
-        McpResourceData resourceData = new McpResourceData(
-                uri,
-                name,
-                description,
-                mimetype,
-                content
-        );
-
-        return build(resourceData);
-    }
-
     public static McpServerFeatures.SyncResourceSpecification build(McpResourceData data) {
         McpSchema.Resource resource = McpSchema.Resource.builder()
                 .uri(data.uri())
@@ -35,22 +14,21 @@ public final class ResourceSpecificationBuilder {
                 .mimeType(data.mimeType())
                 .build();
 
-        McpSchema.TextResourceContents contents = new McpSchema.TextResourceContents(
-                data.uri(),
-                data.mimeType(),
-                data.content()
-        );
 
-        McpSchema.ReadResourceResult result = new McpSchema.ReadResourceResult(
-                List.of(contents)
-        );
-
-        McpServerFeatures.SyncResourceSpecification specification = new McpServerFeatures.SyncResourceSpecification(
+        return new McpServerFeatures.SyncResourceSpecification(
                 resource,
-                (exchange, request) -> result
-        );
+                (exchange, request) -> {
+                    McpSchema.TextResourceContents contents = new McpSchema.TextResourceContents(
+                            request.uri(),
+                            data.mimeType(),
+                            data.content()
+                    );
 
-        return specification;
+                    return new McpSchema.ReadResourceResult(
+                            List.of(contents)
+                    );
+                }
+        );
     }
 }
 
