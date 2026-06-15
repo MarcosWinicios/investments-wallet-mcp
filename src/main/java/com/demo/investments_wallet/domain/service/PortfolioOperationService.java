@@ -132,6 +132,7 @@ public class PortfolioOperationService extends DomainLogger{
         BigDecimal totalAmount = request.quantity().multiply(unitPrice).setScale(2, RoundingMode.HALF_UP);
         BigDecimal updatedQuantity = position.getQuantity().subtract(request.quantity());
 
+
         if (updatedQuantity.compareTo(ZERO) == 0) {
             portfolioPositionRepository.delete(position);
         } else {
@@ -141,7 +142,20 @@ public class PortfolioOperationService extends DomainLogger{
 
         recordTransaction(OperationType.SELL, asset, request.quantity(), unitPrice, totalAmount);
 
-       AssetOperationResponseDto result = AssetOperationResponseDto.builder().build();
+       AssetOperationResponseDto result = AssetOperationResponseDto.builder()
+               .operationType(OperationType.SELL)
+               .assetCategory(asset.getCategory())
+               .assetCode(asset.getCode())
+               .assetName(asset.getName())
+               .transactionQuantity(request.quantity())
+               .transactionAmount(totalAmount)
+               .newAssetBalance(position.getTotalAmount())
+               .newQuantity(updatedQuantity.setScale(2, RoundingMode.HALF_UP))
+               .newAveragePrice(position.getAveragePrice())
+               .build();
+
+       this.logEndMethod("buyAsset",  result);
+
        return result;
     }
 
