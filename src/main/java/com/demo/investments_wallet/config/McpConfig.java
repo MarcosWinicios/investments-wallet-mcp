@@ -1,5 +1,6 @@
 package com.demo.investments_wallet.config;
 
+import com.demo.investments_wallet.mcp.prompt.contract.McpPromptDefinition;
 import com.demo.investments_wallet.mcp.resource.contract.McpResourceDefinition;
 import com.demo.investments_wallet.mcp.tool.contract.McpToolDefinition;
 import io.modelcontextprotocol.server.McpServerFeatures;
@@ -22,6 +23,13 @@ public class McpConfig {
     List<McpServerFeatures.SyncToolSpecification> tools(List<McpToolDefinition> tools){
         return tools.stream()
                 .map(McpToolDefinition::build)
+                .toList();
+    }
+
+    @Bean
+    List<McpServerFeatures.SyncPromptSpecification> prompts(List<McpPromptDefinition> prompts){
+        return prompts.stream()
+                .map(McpPromptDefinition::build)
                 .toList();
     }
 }
