@@ -3,11 +3,9 @@ package com.demo.investments_wallet.mcp.prompt.contract;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@Configuration
 public class McpSpecificationPromptBuilder extends McpPromptExecutor {
 
     @Bean
@@ -24,14 +22,14 @@ public class McpSpecificationPromptBuilder extends McpPromptExecutor {
 
     private static McpSchema.Prompt resolvePromptDefinition(McpPromptData mcpPromptData) {
         return new McpSchema.Prompt(
-                mcpPromptData.name(),
-                mcpPromptData.description(),
+                mcpPromptData.getName(),
+                mcpPromptData.getDescription(),
                 resolveArguments(mcpPromptData)
         );
     }
 
     private static List<McpSchema.PromptArgument> resolveArguments(McpPromptData mcpPromptData) {
-        return mcpPromptData.arguments().stream()
+        return mcpPromptData.getArguments().stream()
                 .map(McpSpecificationPromptBuilder::resolveArgument)
                 .toList();
     }

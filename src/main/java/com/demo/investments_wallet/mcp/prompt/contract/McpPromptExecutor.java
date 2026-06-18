@@ -15,7 +15,7 @@ public abstract class McpPromptExecutor {
             McpPromptData promptData
     ) {
 
-        String text = promptData.text();
+        String text = promptData.getText();
 
         text = text.formatted(request.arguments());
 
@@ -26,7 +26,7 @@ public abstract class McpPromptExecutor {
                 );
 
         return new McpSchema.GetPromptResult(
-                (promptData.resultMessage() == null ? null : promptData.resultMessage()),
+                promptData.getResultMessage(),
                 List.of(message)
         );
     }

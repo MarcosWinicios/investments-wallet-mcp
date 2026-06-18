@@ -20,13 +20,14 @@ public abstract class McpToolExecutor {
             McpToolDefinition toolDefinition
     ) {
 
-        log.info("ToolExecutor[{}] - execution start...", tool.name());
+
+        log.info("[{}] ToolExecutor[{}] - execution start...", exchange.sessionId(), tool.name());
         Map<String, Object> arguments = request.arguments();
 
-        log.debug("ToolExecutor[{}] - received arguments {}", tool.name(), arguments.toString());
+        log.debug("[{}] ToolExecutor[{}] - received arguments {}", exchange.sessionId(), tool.name(), arguments.toString());
 
         McpToolResponse businessResult = toolDefinition.execute(arguments);
-        McpSchema.CallToolResult mcpResult = toCallToolResult(businessResult, tool.name());
+        McpSchema.CallToolResult mcpResult = toCallToolResult(businessResult, tool.name(), exchange.sessionId());
 
         if(log.isDebugEnabled()) {
             String resulStr = mcpResult.content().stream()
@@ -36,15 +37,15 @@ public abstract class McpToolExecutor {
                     .map(McpSchema.TextContent::text)
                     .orElseGet(String::new);
 
-            log.debug("ToolExecutor[{}] - response tool execution: {}", tool.name(), resulStr);
+            log.debug("[{}] ToolExecutor[{}] - response tool execution: {}", exchange.sessionId(), tool.name(), resulStr);
         }
 
-        log.info("ToolExecutor[{}] - execution end...", tool.name());
+        log.info("[{}] ToolExecutor[{}] - execution end...",  exchange.sessionId(), tool.name());
 
         return mcpResult;
     }
-    private static McpSchema.CallToolResult toCallToolResult(McpToolResponse mcpToolResponse, String toolName) {
-        log.info("ToolExecutor[{}] -  building response...",  toolName);
+    private static McpSchema.CallToolResult toCallToolResult(McpToolResponse mcpToolResponse, String toolName, String sessionId) {
+        log.info("[{}] ToolExecutor[{}] -  building response...",  sessionId, toolName);
         try {
 
             String json = JsonUtil.toJson(mcpToolResponse);
