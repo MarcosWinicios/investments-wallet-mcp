@@ -20,11 +20,16 @@ public class AssetPosition implements McpPromptDefinition {
         McpPromptData mcpPromptData = new McpPromptData(
                 "find_asset_position",
                 "Find asset position",
+                "Return the asset position.",
                 text,
                 "Asset Position"
         );
 
-        mcpPromptData.addArgument("ticker", "Asset ticker code", true);
+        mcpPromptData.addArgument(
+                "ticker",
+                "Ticker",
+                "Asset ticker code.",
+                true);
         return mcpPromptData;
     }
 
