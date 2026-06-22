@@ -21,6 +21,7 @@ public class WalletSummary implements McpPromptDefinition {
         return new McpPromptData(
                 "wallet_summary",
                 "Wallet summary",
+                "Return a simple summary of the investments wallet.",
                 text,
                 "Your Summary wallet is ready"
         );
