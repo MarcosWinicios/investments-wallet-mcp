@@ -2,6 +2,7 @@ package com.demo.investments_wallet.domain.service;
 
 import com.demo.investments_wallet.domain.entity.AssetEntity;
 import com.demo.investments_wallet.domain.entity.PortfolioPositionEntity;
+import com.demo.investments_wallet.domain.exception.EntityNotFoundException;
 import com.demo.investments_wallet.domain.repository.PortfolioPositionRepository;
 import com.demo.investments_wallet.domain.types.AssetCategory;
 import com.demo.investments_wallet.dto.PortfolioPositionViewDto;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PortfolioQueryService extends DomainLogger{
@@ -70,6 +72,16 @@ public class PortfolioQueryService extends DomainLogger{
                 new PortfolioSummaryResponseDto(views, totalPortfolioValue.setScale(2, RoundingMode.HALF_UP), allocation);
 
         this.logEndMethod("getPortfolio", result);
+        return result;
+    }
+
+    public PortfolioPositionViewDto getPortfolioAssetPosition(String assetCode) {
+        this.logStartMethod("getPortfolioAssetPosition");
+        PortfolioPositionEntity byAssetCode = this.portfolioPositionRepository.getByAssetCode(assetCode)
+                .orElseThrow(() -> new EntityNotFoundException("Asset code " + assetCode + " not found in Portfolio"));
+
+        PortfolioPositionViewDto result = new PortfolioPositionViewDto(byAssetCode);
+        this.logEndMethod("getPortfolioAssetPosition", result);
         return result;
     }
 }

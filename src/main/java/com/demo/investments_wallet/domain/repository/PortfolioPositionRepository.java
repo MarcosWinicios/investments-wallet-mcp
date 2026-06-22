@@ -18,4 +18,6 @@ public interface PortfolioPositionRepository extends JpaRepository<PortfolioPosi
             ORDER BY p.assetCode
             """)
     List<PortfolioPositionEntity> findAllActivePositions();
+
+    Optional<PortfolioPositionEntity> getByAssetCode(String assetCode);
 }
