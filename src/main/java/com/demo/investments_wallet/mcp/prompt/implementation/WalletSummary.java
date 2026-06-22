@@ -11,11 +11,12 @@ public class WalletSummary implements McpPromptDefinition {
     public McpPromptData getData() {
 
         String text = """
-            You are an investor specialist.
-            Make a summary of my wallet.
-       
-            For this, use the "get_portfolio" mcp tool like data source.
-       """;
+                You are an investor specialist.
+                Make a summary of my wallet.
+                
+                - For this, use the "get_portfolio" mcp tool like data source.
+                - Always answer in Portuguese language.
+                """;
 
         return new McpPromptData(
                 "wallet_summary",
