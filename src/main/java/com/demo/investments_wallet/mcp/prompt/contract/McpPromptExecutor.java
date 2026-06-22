@@ -2,10 +2,12 @@ package com.demo.investments_wallet.mcp.prompt.contract;
 
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Slf4j
 @Component
 public abstract class McpPromptExecutor {
 
@@ -14,6 +16,7 @@ public abstract class McpPromptExecutor {
             McpSchema.GetPromptRequest request,
             McpPromptData promptData
     ) {
+        log.debug("McpPromptExecutor execute start...");
 
         String text = promptData.getText();
 
@@ -25,10 +28,14 @@ public abstract class McpPromptExecutor {
                         new McpSchema.TextContent(text)
                 );
 
-        return new McpSchema.GetPromptResult(
+        McpSchema.GetPromptResult result = new McpSchema.GetPromptResult(
                 promptData.getResultMessage(),
                 List.of(message)
         );
+
+        log.debug("McpPromptExecutor execute end...");
+
+        return result;
     }
 
 }
