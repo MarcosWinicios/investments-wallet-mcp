@@ -10,11 +10,11 @@ import java.util.Map;
 
 @Getter
 public class McpPromptData {
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
     private final List<McpPromptArgumentData> arguments = new ArrayList<>();
-    private String text;
-    private String resultMessage;
+    private final String text;
+    private final String resultMessage;
 
     public McpPromptData(String name, String description, String text, String resultMessage) {
         this.name = name;
