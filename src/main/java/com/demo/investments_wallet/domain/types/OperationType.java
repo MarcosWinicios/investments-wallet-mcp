@@ -5,8 +5,8 @@ public enum OperationType {
     SELL;
 
     public static OperationType fromString(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("OperationType value cannot be null or empty");
+        if (value == null || value.trim().isEmpty() || value.isBlank()) {
+            return null;
         }
 
         try {
