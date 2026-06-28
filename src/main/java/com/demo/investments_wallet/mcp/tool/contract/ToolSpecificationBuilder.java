@@ -14,24 +14,28 @@ import java.util.Map;
 public class ToolSpecificationBuilder extends McpToolExecutor {
 
     public static McpServerFeatures.SyncToolSpecification build(McpToolDefinition definition) {
+        try {
+            Map<String, Object> inputSchema = resolveInputSchema(definition.getData().inputSchema());
 
-        Map<String, Object> inputSchema = resolveInputSchema(definition.getData().inputSchema());
+            McpSchema.Tool tool = McpSchema.Tool.builder()
+                    .name(definition.getData().name())
+                    .description(definition.getData().description())
+                    .title(definition.getData().title())
+                    .inputSchema(inputSchema)
+                    .build();
 
-        McpSchema.Tool tool = McpSchema.Tool.builder()
-                .name(definition.getData().name())
-                .description(definition.getData().description())
-                .title(definition.getData().title())
-                .inputSchema(inputSchema)
-                .build();
-
-        McpServerFeatures.SyncToolSpecification createdTool = McpServerFeatures.SyncToolSpecification.builder()
-                .tool(tool)
-                .callHandler((exchange, request) -> McpToolExecutor.execute(
-                        exchange, request, tool, definition
-                ))
-                .build();
-        log.info("registered tool: [{}] - {}", tool.name(), inputSchema);
-        return createdTool;
+            McpServerFeatures.SyncToolSpecification createdTool = McpServerFeatures.SyncToolSpecification.builder()
+                    .tool(tool)
+                    .callHandler((exchange, request) -> McpToolExecutor.execute(
+                            exchange, request, tool, definition
+                    ))
+                    .build();
+            log.info("registered tool: [{}] - {}", tool.name(), inputSchema);
+            return createdTool;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return null;
+        }
     }
 
     private static Map<String, Object> resolveInputSchema(McpToolInputSchema inputSchema) {
