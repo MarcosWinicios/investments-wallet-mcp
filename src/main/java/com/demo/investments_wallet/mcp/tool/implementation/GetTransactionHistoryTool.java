@@ -8,6 +8,7 @@ import com.demo.investments_wallet.mcp.tool.contract.McpToolData;
 import com.demo.investments_wallet.mcp.tool.contract.McpToolDefinition;
 import com.demo.investments_wallet.mcp.tool.contract.McpToolInputSchema;
 import com.demo.investments_wallet.mcp.tool.contract.McpToolResponse;
+import com.demo.investments_wallet.utils.DateUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -37,7 +38,7 @@ public class GetTransactionHistoryTool implements McpToolDefinition {
 
     private McpToolInputSchema buildInputSchema() {
         McpToolInputSchema result = McpToolInputSchema.builder()
-                .type("string")
+                .type("object")
                 .isRequired(false)
                 .build();
 
@@ -75,19 +76,27 @@ public class GetTransactionHistoryTool implements McpToolDefinition {
     public McpToolResponse execute(Map<String, Object> parameters) {
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            OperationType operationType = this.resolveOperationTypeParameters(String.valueOf(parameters.get("operationType")));
+            LocalDateTime startDate = DateUtil.parseLocalDateTime(String.valueOf(parameters.get("startDate")));
+            LocalDateTime endDate = DateUtil.parseLocalDateTime(String.valueOf(parameters.get("endDate")));
+            endDate = DateUtil.toEndOfDay(endDate);
+
             TransactionHistoryFilterRequestDto filters = TransactionHistoryFilterRequestDto.builder()
-                    .assetCode(this.resolveStringParameters(parameters.get("ticker").toString()))
-                    .operationType(this.resolveOperationTypeParameters(parameters.get("operationType").toString()))
-                    .startDate(this.resolveDateTimeParameters(parameters.get("startDate").toString()))
-                    .endDate(this.resolveDateTimeParameters(parameters.get("endDate").toString()))
+                    .assetCode(this.resolveStringParameters(String.valueOf(parameters.get("ticker"))))
+                    .operationType(operationType)
+                    .startDate(startDate)
+                    .endDate(endDate)
                     .build();
 
-            List<TransactionHistoryEntryDto> transactionHistory = this.transactionHistoryService.getTransactionHistory(filters);
+            boolean filtersIsNull = filtersIsNull(filters);
+
+
+            List<TransactionHistoryEntryDto> transactionHistory =
+                    this.transactionHistoryService.getTransactionHistory(filtersIsNull ?  null : filters);
 
             List<Map<String, Object>> resultList = transactionHistory.stream()
                     .map(TransactionHistoryEntryDto::toMap)
                     .toList();
-
 
             resultMap.put("transactionHistory", resultList);
 
@@ -100,10 +109,18 @@ public class GetTransactionHistoryTool implements McpToolDefinition {
         }
     }
 
+    private static boolean filtersIsNull(TransactionHistoryFilterRequestDto filters) {
+        return filters.startDate() == null
+                && filters.endDate() == null
+                && filters.assetCode() == null
+                && filters.operationType() == null;
+    }
+
     private String resolveStringParameters(String parameter) {
         if (parameter == null) return null;
         if (parameter.isEmpty()) return null;
         if (parameter.isBlank()) return null;
+        if("null".equalsIgnoreCase(parameter)) return null;
 
         return parameter;
     }
@@ -111,12 +128,12 @@ public class GetTransactionHistoryTool implements McpToolDefinition {
     private LocalDateTime resolveDateTimeParameters(String parameter) {
         if (this.resolveStringParameters(parameter) == null) return null;
 
-        return LocalDateTime.parse(parameter);
+        return DateUtil.parseLocalDateTime(parameter);
     }
 
     private OperationType resolveOperationTypeParameters(String parameter) {
         if (this.resolveStringParameters(parameter) == null) return null;
 
-        return OperationType.fromString(parameter);
+        return OperationType.fromString(parameter.toUpperCase());
     }
 }
