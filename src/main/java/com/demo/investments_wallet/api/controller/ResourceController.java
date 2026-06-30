@@ -1,8 +1,6 @@
 package com.demo.investments_wallet.api.controller;
 
-import com.demo.investments_wallet.domain.entity.AssetEntity;
-import com.demo.investments_wallet.domain.service.AssetCatalogService;
-import com.demo.investments_wallet.mcp.McpService;
+import com.demo.investments_wallet.mcp.service.ResourceMcpService;
 import com.demo.investments_wallet.mcp.to.ResourceDataResumeTo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,25 +11,17 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/mcp/resources")
+@RequestMapping("/resources")
 public class ResourceController {
 
-    private final AssetCatalogService assetCatalogService;
+    private final ResourceMcpService resourceMcpService;
 
-    private final McpService mcpService;
-
-    public ResourceController(AssetCatalogService assetCatalogService, McpService mcpService) {
-        this.assetCatalogService = assetCatalogService;
-        this.mcpService = mcpService;
+    public ResourceController(ResourceMcpService resourceMcpService) {
+        this.resourceMcpService = resourceMcpService;
     }
 
     @GetMapping()
-    public List<ResourceDataResumeTo> listAll(){
-        return this.mcpService.getAvailableResources();
-    }
-
-    @GetMapping("/assets-catalog")
-    public List<AssetEntity> getAssetsCatalog(){
-        return this.assetCatalogService.getAllAssets();
+    public List<ResourceDataResumeTo> listAll() {
+        return this.resourceMcpService.getAvailableResources();
     }
 }
