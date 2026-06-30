@@ -1,7 +1,5 @@
-package com.demo.investments_wallet.mcp;
+package com.demo.investments_wallet.mcp.service;
 
-import com.demo.investments_wallet.mcp.resource.contract.McpResourceDefinition;
-import com.demo.investments_wallet.mcp.to.ResourceDataResumeTo;
 import com.demo.investments_wallet.mcp.to.ToolDataResumeTo;
 import com.demo.investments_wallet.mcp.tool.contract.McpToolData;
 import com.demo.investments_wallet.mcp.tool.contract.McpToolDefinition;
@@ -12,21 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class McpService {
+public class ToolMcpService {
 
-
-    private final List<McpResourceDefinition> availableResources;
     private final List<McpToolDefinition> availableTools;
 
-    public McpService(List<McpResourceDefinition> availableResources, List<McpToolDefinition> availableTools) {
-        this.availableResources = availableResources;
-        this.availableTools = availableTools;
-    }
 
-    public List<ResourceDataResumeTo> getAvailableResources() {
-        return availableResources.stream()
-                .map(resource -> new ResourceDataResumeTo(resource.data()))
-                .toList();
+    public ToolMcpService(List<McpToolDefinition> availableTools) {
+        this.availableTools = availableTools;
     }
 
     public List<ToolDataResumeTo> getAvailableTools(){
